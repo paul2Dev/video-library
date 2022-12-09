@@ -1,20 +1,42 @@
 import '../css/style.css'
 
-import { setupCounter } from './counter.js'
+const input = document.querySelector('#newVideo');
+const button = document.querySelector('#addVideo');
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+const videos = [];
 
-setupCounter(document.querySelector('#counter'))
+button.addEventListener('click', function(e) {
+  e.preventDefault();
+  const video = input.value;
+  const videoId = getYoutubeVideoId(video)
+
+  if(videoId) {
+    if(!videos.includes(videoId)) {
+      videos.push(videoId);
+      renderVideos();
+    } else {
+      alert('Video already added');
+    }
+  }
+
+});
+
+function renderVideos() {
+  const videosContainer = document.querySelector('#videos');
+  videosContainer.innerHTML = '';
+  videos.forEach( video =>  {
+    const videoContainer = document.createElement('div');
+    videoContainer.innerHTML = `
+      <iframe width="360" height="280" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    `;
+    videosContainer.appendChild(videoContainer);
+  });
+}
+
+function getYoutubeVideoId(url){
+  var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  var match = url.match(regExp);
+  return (match&&match[7].length==11)? match[7] : false;
+}
+
+renderVideos();
