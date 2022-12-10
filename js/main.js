@@ -3,7 +3,7 @@ import '../css/style.css'
 const input = document.querySelector('#newVideo');
 const button = document.querySelector('#addVideo');
 
-const videos = [];
+const videos = JSON.parse(localStorage.getItem("videos") || "[]")
 
 button.addEventListener('click', function(e) {
   e.preventDefault();
@@ -13,6 +13,7 @@ button.addEventListener('click', function(e) {
   if(videoId) {
     if(!videos.includes(videoId)) {
       videos.push(videoId);
+      localStorage.setItem("videos", JSON.stringify(videos));
       renderVideos();
     } else {
       alert('Video already added');
