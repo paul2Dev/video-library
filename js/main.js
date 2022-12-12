@@ -85,13 +85,16 @@ function renderCategoryTitle(parentContainer, category) {
 
 function renderVideosCategoryGrid(parentContainer, category) {
   const videosGrid = document.createElement('div');
-  videosGrid.classList.add('videos', 'grid', 'grid-cols-4', 'gap-10');
+  videosGrid.classList.add('videos', 'grid', 'grid-cols-6', 'gap-10');
   parentContainer.appendChild(videosGrid);
 
   videos[category].forEach( video => {
     const videoContainer = document.createElement('div');
+    // videoContainer.innerHTML = `
+    //   <iframe width="360" height="280" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    // `;
     videoContainer.innerHTML = `
-      <iframe width="360" height="280" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" />
     `;
     videosGrid.appendChild(videoContainer);
   });
