@@ -1,9 +1,11 @@
+import 'flowbite';
 import '../css/style.css'
 
 const input = document.querySelector('#newVideo');
 const button = document.querySelector('#addVideo');
 const select = document.querySelector('#videoCategory');
-
+const iframe = document.querySelector('#iframeVideo');
+const closeModal = document.querySelector('#closeModal');
 
 const videos = JSON.parse(localStorage.getItem("videos") || JSON.stringify({}))
 
@@ -34,6 +36,11 @@ button.addEventListener('click', function(e) {
     }
   }
 
+});
+
+closeModal.addEventListener('click', function(e) {
+  e.preventDefault();
+  iframe.innerHTML = '';
 });
 
 renderVideos();
@@ -90,13 +97,18 @@ function renderVideosCategoryGrid(parentContainer, category) {
 
   videos[category].forEach( video => {
     const videoContainer = document.createElement('div');
-    // videoContainer.innerHTML = `
-    //   <iframe width="360" height="280" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    // `;
     videoContainer.innerHTML = `
-      <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" />
+      <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" data-modal-toggle="defaultModal" />
     `;
     videosGrid.appendChild(videoContainer);
+
+    videoContainer.addEventListener('click', function(e) {
+      e.preventDefault();
+      iframe.innerHTML = `
+        <iframe class="w-full h-96" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      `;
+    });
+
   });
 }
 
