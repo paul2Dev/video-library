@@ -97,10 +97,24 @@ function renderVideosCategoryGrid(parentContainer, category) {
 
   videos[category].forEach( video => {
     const videoContainer = document.createElement('div');
+    videoContainer.classList.add('relative');
     videoContainer.innerHTML = `
       <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" data-modal-toggle="defaultModal" />
+      <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+          <span class="sr-only">Close modal</span>
+      </button>
     `;
     videosGrid.appendChild(videoContainer);
+
+    const removeButton = videoContainer.querySelector('button');
+
+    removeButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      videos[category] = videos[category].filter( videoId => videoId !== video);
+      localStorage.setItem("videos", JSON.stringify(videos));
+      renderVideos();
+    });
 
     videoContainer.addEventListener('click', function(e) {
       e.preventDefault();
