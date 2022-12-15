@@ -4,7 +4,7 @@ import '../css/style.css'
 const input = document.querySelector('#newVideo');
 const button = document.querySelector('#addVideo');
 const select = document.querySelector('#videoCategory');
-const iframe = document.querySelector('#iframeVideo');
+const modal = document.querySelector('#iframeVideo');
 const closeModal = document.querySelector('#closeModal');
 
 const videos = JSON.parse(localStorage.getItem("videos") || JSON.stringify({}))
@@ -17,6 +17,8 @@ const categories = {
 };
 
 initLocalStorageAndCategoriesSelect(categories, videos, select);
+
+renderNavigation(categories);
 
 button.addEventListener('click', function(e) {
   e.preventDefault();
@@ -40,13 +42,31 @@ button.addEventListener('click', function(e) {
 
 closeModal.addEventListener('click', function(e) {
   e.preventDefault();
-  iframe.innerHTML = '';
+  modal.innerHTML = '';
 });
 
 renderVideos();
 
 
 // Functions
+
+function renderNavigation(categories){
+  const navigationList = document.querySelector('#navigationList');
+  navigationList.innerHTML = `
+    <li class="mr-2">
+      <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-gray-300 text-gray-600">all</a>
+    </li>
+  `;
+
+  for(const category in categories) {
+    const navigationItem = document.createElement('li');
+    navigationItem.classList.add('mr-2');
+    navigationItem.innerHTML = `
+      <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">${category}</a>
+    `;
+    navigationList.appendChild(navigationItem);
+  }
+}
 
 function initLocalStorageAndCategoriesSelect(categories, videos, select) {
   
@@ -118,7 +138,7 @@ function renderVideosCategoryGrid(parentContainer, category) {
 
     videoContainer.addEventListener('click', function(e) {
       e.preventDefault();
-      iframe.innerHTML = `
+      modal.innerHTML = `
         <iframe class="w-full h-96" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       `;
     });
