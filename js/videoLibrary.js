@@ -59,14 +59,14 @@ export default class videoLibrary {
         this.registerNavigationEvent(navigationItemFirst);
       
         for(const category in this.categories) {
-          const navigationItem = document.createElement('li');
-          navigationItem.classList.add('mr-2');
-          navigationItem.innerHTML = `
+            const navigationItem = document.createElement('li');
+            navigationItem.classList.add('mr-2');
+            navigationItem.innerHTML = `
             <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" data-category="${category}">${category}</a>
-          `;
-          navigationList.appendChild(navigationItem);
-      
-          this.registerNavigationEvent(navigationItem, category);
+            `;
+            navigationList.appendChild(navigationItem);
+        
+            this.registerNavigationEvent(navigationItem, category);
         }
     }
 
@@ -136,15 +136,19 @@ export default class videoLibrary {
         
         for(const category in this.videos) {
             this.videos[category].forEach( video => {
-              const videoContainer = document.createElement('div');
-              videoContainer.classList.add('relative');
-              videoContainer.innerHTML = `
-                <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" data-modal-toggle="defaultModal" />
-                <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
-                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v8.586l3.293-3.293a1 1 0 111.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 011.414-1.414L9 12.586V4a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-                </button>
-              `;
-              videosGrid.appendChild(videoContainer);
+                const videoContainer = document.createElement('div');
+                videoContainer.classList.add('relative');
+                videoContainer.innerHTML = `
+                    <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" data-modal-toggle="defaultModal" />
+                    <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                `;
+                videosGrid.appendChild(videoContainer);
+
+                this.registerRemoveVideoEvent(video, category, videoContainer);
+
+                this.registerAddVideoToModalEvent(video, videoContainer);
             });
         }
         
@@ -168,34 +172,42 @@ export default class videoLibrary {
         parentContainer.appendChild(videosGrid);
       
         this.videos[category].forEach( video => {
-          const videoContainer = document.createElement('div');
-          videoContainer.classList.add('relative');
-          videoContainer.innerHTML = `
+            const videoContainer = document.createElement('div');
+            videoContainer.classList.add('relative');
+            videoContainer.innerHTML = `
             <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" data-modal-toggle="defaultModal" />
             <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
                 <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
             </button>
-          `;
-          videosGrid.appendChild(videoContainer);
-      
-          const removeButton = videoContainer.querySelector('button');
-      
-          removeButton.addEventListener('click', function(e) {
+            `;
+            videosGrid.appendChild(videoContainer);
+
+            this.registerRemoveVideoEvent(video, category, videoContainer);
+
+            this.registerAddVideoToModalEvent(video, videoContainer);
+        });
+    }
+
+    registerRemoveVideoEvent(video, category, videoContainer) {
+        const removeButton = videoContainer.querySelector('button');
+    
+        removeButton.addEventListener('click', function(e) {
             e.preventDefault();
             this.videos[category] = this.videos[category].filter( videoId => videoId !== video);
             this.updateStorage(videos);
             this.renderVideos(category);
-          }.bind(this));
-      
-          videoContainer.addEventListener('click', function(e) {
+        }.bind(this));
+    }
+
+    registerAddVideoToModalEvent(video, videoContainer) {
+        videoContainer.addEventListener('click', function(e) {
             e.preventDefault();
             this.modal.innerHTML = `
-              <iframe class="w-full h-96" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="w-full h-96" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             `;
-          }.bind(this));
-      
-        });
+        }.bind(this));
     }
+
 
     addVideo(category, videoId) {
         this.videos[category].push(videoId);
