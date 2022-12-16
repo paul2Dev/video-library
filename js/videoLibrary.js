@@ -52,7 +52,7 @@ export default class videoLibrary {
         const navigationItemFirst = document.createElement('li');
         navigationItemFirst.classList.add('mr-2');
         navigationItemFirst.innerHTML = `
-          <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-gray-300 text-gray-600" data-category="all">all</a>
+          <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" data-category="all">all</a>
         `;
         navigationList.appendChild(navigationItemFirst);
 
@@ -73,6 +73,15 @@ export default class videoLibrary {
     registerNavigationEvent(item, category = 'all') {
         item.addEventListener('click', function(e) {
             e.preventDefault();
+            
+            item.parentElement.querySelectorAll('li').forEach( link => {
+                if(link.classList.contains('active') === true)  {
+                    link.classList.remove('border-b-2', 'border-blue-600', 'active', 'text-blue-600');
+                }
+            });
+
+            item.classList.add('border-b-2', 'border-blue-600', 'active', 'text-blue-600');
+            
             console.log('registerNavigationEvent for category: ' + category);
             this.renderVideos(category);
         }.bind(this));
