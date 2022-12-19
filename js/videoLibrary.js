@@ -4,9 +4,6 @@ export default class videoLibrary {
         this.input = document.querySelector('#newVideo');
         this.button = document.querySelector('#addVideo');
         this.select = document.querySelector('#videoCategory');
-        this.modal = document.querySelector('#iframeVideo');
-        this.closeModal = document.querySelector('#closeModal');
-
         this.videos = JSON.parse(localStorage.getItem("videos") || JSON.stringify({}))
 
         this.categories = {
@@ -15,6 +12,30 @@ export default class videoLibrary {
         'photography': [],
         'gym': [],
         };
+
+        // set the modal menu element
+        const targetEl = document.getElementById('defaultModal');
+
+        // options with default values
+        const options = {
+        placement: 'center',
+        backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
+        onHide: () => {
+            console.log('modal is hidden');
+        },
+        onShow: () => {
+            console.log('modal is shown');
+        },
+        onToggle: () => {
+            console.log('modal has been toggled');
+        }
+        };
+
+
+        this.modal = new Modal(targetEl, options);
+
+        this.modalContent = document.querySelector('#iframeVideo');
+        this.closeModal = document.querySelector('#closeModal');
     }
 
     init() {
@@ -27,7 +48,9 @@ export default class videoLibrary {
         this.registerCloseModalEvent();
 
         this.renderVideos();
+
     }
+
 
     renderCategorySelect() {
         for (const category in this.categories) {
@@ -83,7 +106,9 @@ export default class videoLibrary {
             item.classList.add('border-b-2', 'border-blue-600', 'active', 'text-blue-600');
             
             console.log('registerNavigationEvent for category: ' + category);
-            this.renderVideos(category);
+            
+            this.renderVideos(category); //this may be the problem
+
         }.bind(this));
     }
 
@@ -112,7 +137,8 @@ export default class videoLibrary {
     registerCloseModalEvent() {
         this.closeModal.addEventListener('click', function(e) {
             e.preventDefault();
-            this.modal.innerHTML = '';
+            this.modalContent.innerHTML = '';
+            this.modal.hide();
         }.bind(this));
     }
 
@@ -125,6 +151,7 @@ export default class videoLibrary {
     renderVideos(renderCategory = 'all') {
         const videosContainer = document.querySelector('#videos');
         videosContainer.innerHTML = '';
+
       
         if(renderCategory === 'all') {
             this.renderAllVideos(videosContainer);
@@ -148,7 +175,7 @@ export default class videoLibrary {
                 const videoContainer = document.createElement('div');
                 videoContainer.classList.add('relative');
                 videoContainer.innerHTML = `
-                    <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" data-modal-toggle="defaultModal" />
+                    <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" />
                     <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
                         <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </button>
@@ -184,7 +211,7 @@ export default class videoLibrary {
             const videoContainer = document.createElement('div');
             videoContainer.classList.add('relative');
             videoContainer.innerHTML = `
-            <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" data-modal-toggle="defaultModal" />
+            <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" />
             <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
                 <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
             </button>
@@ -211,9 +238,10 @@ export default class videoLibrary {
     registerAddVideoToModalEvent(video, videoContainer) {
         videoContainer.addEventListener('click', function(e) {
             e.preventDefault();
-            this.modal.innerHTML = `
+            this.modalContent.innerHTML = `
                 <iframe class="w-full h-96" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             `;
+            this.modal.show();
         }.bind(this));
     }
 
