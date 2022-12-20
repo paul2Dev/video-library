@@ -30,10 +30,6 @@ export default class videoLibrary {
 
         this.renderVideoModal();
 
-        this.registerAddVideoEvent();
-
-        this.registerCloseModalEvent();
-
         this.renderVideos();
 
     }
@@ -88,6 +84,8 @@ export default class videoLibrary {
 
         this.modalContent = document.querySelector('#iframeVideo');
         this.closeModal = document.querySelector('#closeModal');
+
+        this.registerCloseModalEvent();
         
     }
 
@@ -145,6 +143,8 @@ export default class videoLibrary {
             }
         }
         this.updateStorage();
+
+        this.registerAddVideoEvent();
     }
 
     updateStorage() {
