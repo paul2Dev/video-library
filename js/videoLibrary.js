@@ -328,7 +328,8 @@ export default class videoLibrary {
     }
 
     registerAddVideoToModalEvent(video, videoContainer) {
-        videoContainer.addEventListener('click', function(e) {
+        const videoThumb = videoContainer.querySelector('img');
+        videoThumb.addEventListener('click', function(e) {
             e.preventDefault();
             this.modalContent.innerHTML = `
                 <iframe class="w-full h-96" src="https://www.youtube.com/embed/${video}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
