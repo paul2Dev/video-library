@@ -9,6 +9,8 @@ export default class videoLibrary {
         this.modal = '';
         this.modalContent = '';
         this.closeModal = '';
+        this.dragStartIndex = '';
+        this.currentCategory = 'all';
 
         this.videos = JSON.parse(localStorage.getItem("videos") || JSON.stringify({}))
 
@@ -246,8 +248,10 @@ export default class videoLibrary {
 
       
         if(renderCategory === 'all') {
+            this.currentCategory = 'all';
             this.renderAllVideos(videosContainer);
         } else {
+            this.currentCategory = renderCategory;
             this.renderCategoryVideos(videosContainer, renderCategory);
         }
     }
@@ -263,11 +267,12 @@ export default class videoLibrary {
       
         
         for(const category in this.videos) {
-            this.videos[category].forEach( video => {
+            this.videos[category].forEach( (video, index) => {
                 const videoContainer = document.createElement('div');
                 videoContainer.classList.add('relative');
+                videoContainer.setAttribute('data-index', index);
                 videoContainer.innerHTML = `
-                    <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" />
+                    <img draggable="true" src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="draggable cursor-pointer" />
                     <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
                         <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </button>
@@ -278,6 +283,8 @@ export default class videoLibrary {
 
                 this.registerAddVideoToModalEvent(video, videoContainer);
             });
+
+            this.addDragAndDropEvents();
         }
         
     }
@@ -299,11 +306,12 @@ export default class videoLibrary {
         videosGrid.classList.add('videos', 'grid', 'grid-cols-6', 'gap-10', 'my-5');
         parentContainer.appendChild(videosGrid);
       
-        this.videos[category].forEach( video => {
+        this.videos[category].forEach( (video, index) => {
             const videoContainer = document.createElement('div');
             videoContainer.classList.add('relative');
+            videoContainer.setAttribute('data-index', index);
             videoContainer.innerHTML = `
-            <img src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="cursor-pointer" />
+            <img draggable="true" src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="draggable cursor-pointer" />
             <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
                 <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
             </button>
@@ -314,6 +322,52 @@ export default class videoLibrary {
 
             this.registerAddVideoToModalEvent(video, videoContainer);
         });
+
+        this.addDragAndDropEvents();
+    }
+
+    addDragAndDropEvents() {
+        const draggables = document.querySelectorAll('.draggable');
+        const draggableList = document.querySelectorAll('.videos div');
+
+        draggables.forEach( draggable => {
+            draggable.addEventListener('dragstart', function(e) {
+                this.dragStartIndex = +draggable.parentElement.getAttribute('data-index');
+            }.bind(this));
+        });
+
+        draggableList.forEach( item => {
+            item.addEventListener('dragover', function(e) {
+                //console.log('dragover');
+                e.preventDefault();
+            });
+            item.addEventListener('drop', function(e) {
+                //console.log('dragDrop');
+                const dragEndIndex = +item.getAttribute('data-index');
+                this.swapVideos(this.dragStartIndex, dragEndIndex);
+            }.bind(this));
+            item.addEventListener('dragenter', function(e) {
+                console.log('DragEnter');
+                //console.log(this);
+                item.classList.add('opacity-50');
+            });
+            item.addEventListener('dragleave', function(e) {
+                item.classList.remove('opacity-50');
+            });
+        });
+        
+    }
+
+    swapVideos(fromIndex, toIndex) {
+        const itemOne = this.videos[this.currentCategory][fromIndex];
+        const itemTwo = this.videos[this.currentCategory][toIndex];
+
+        this.videos[this.currentCategory][fromIndex] = itemTwo;
+        this.videos[this.currentCategory][toIndex] = itemOne;
+
+        this.updateStorage(this.videos);
+        this.renderVideos(this.currentCategory);
+        
     }
 
     registerRemoveVideoEvent(video, category, videoContainer) {
