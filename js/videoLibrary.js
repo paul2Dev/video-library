@@ -367,7 +367,6 @@ export default class videoLibrary {
 
         this.updateStorage(this.videos);
         this.renderVideos(this.currentCategory);
-        
     }
 
     registerRemoveVideoEvent(video, category, videoContainer) {
