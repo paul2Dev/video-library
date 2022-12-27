@@ -284,7 +284,7 @@ export default class videoLibrary {
                 this.registerAddVideoToModalEvent(video, videoContainer);
             });
 
-            this.addDragAndDropEvents();
+            //this.addDragAndDropEvents();
         }
         
     }
