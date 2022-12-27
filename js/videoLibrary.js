@@ -72,13 +72,13 @@ export default class videoLibrary {
             placement: 'center',
             backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
             onHide: () => {
-                console.log('modal is hidden');
+                //console.log('modal is hidden');
             },
             onShow: () => {
-                console.log('modal is shown');
+                //console.log('modal is shown');
             },
             onToggle: () => {
-                console.log('modal has been toggled');
+                //console.log('modal has been toggled');
             }
         };
 
@@ -199,8 +199,6 @@ export default class videoLibrary {
 
             item.classList.add('border-b-2', 'border-blue-600', 'active', 'text-blue-600');
             
-            console.log('registerNavigationEvent for category: ' + category);
-            
             this.renderVideos(category); //this may be the problem
 
         }.bind(this));
@@ -219,7 +217,6 @@ export default class videoLibrary {
                     this.addVideo(category, videoId);
                     this.updateStorage();
                     this.input.value = '';
-                    console.log('registerAddVideoEvent for category: ' + category);
                     this.renderVideos(category);
                 } else {
                     alert('Video already added');
@@ -338,17 +335,15 @@ export default class videoLibrary {
 
         draggableList.forEach( item => {
             item.addEventListener('dragover', function(e) {
-                //console.log('dragover');
                 e.preventDefault();
             });
+
             item.addEventListener('drop', function(e) {
-                //console.log('dragDrop');
                 const dragEndIndex = +item.getAttribute('data-index');
                 this.swapVideos(this.dragStartIndex, dragEndIndex);
             }.bind(this));
+
             item.addEventListener('dragenter', function(e) {
-                console.log('DragEnter');
-                //console.log(this);
                 item.classList.add('opacity-50');
             });
             item.addEventListener('dragleave', function(e) {
