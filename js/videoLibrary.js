@@ -15,10 +15,14 @@ export default class videoLibrary {
         this.videos = JSON.parse(localStorage.getItem("videos") || JSON.stringify({}))
 
         this.categories = {
+        'all': [],
         'gaming': [],
         'coding': [],
         'photography': [],
         'gym': [],
+        'tutorials': [],
+        'news': [],
+        'trailers': [],
         };
         
     }
@@ -130,16 +134,17 @@ export default class videoLibrary {
         formContainer.appendChild(form);
         this.appContainer.appendChild(formContainer);
 
-
         this.input = document.querySelector('#newVideo');
         this.button = document.querySelector('#addVideo');
         this.select = document.querySelector('#videoCategory');
         
         for (const category in this.categories) {
-            const option = document.createElement('option');
-            option.value = category;
-            option.textContent = category;
-            this.select.appendChild(option);
+            if(category != 'all') {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                this.select.appendChild(option);
+            }   
             if(!this.videos[category]){
                 this.videos[category] = [];
             }
@@ -163,15 +168,6 @@ export default class videoLibrary {
         navigationList.classList.add('flex', 'flex-wrap', '-mb-px');
 
         navigationContainer.appendChild(navigationList);
-
-        const navigationItemFirst = document.createElement('li');
-        navigationItemFirst.classList.add('mr-2');
-        navigationItemFirst.innerHTML = `
-          <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" data-category="all">all</a>
-        `;
-        navigationList.appendChild(navigationItemFirst);
-
-        this.registerNavigationEvent(navigationItemFirst);
       
         for(const category in this.categories) {
             const navigationItem = document.createElement('li');
@@ -199,7 +195,7 @@ export default class videoLibrary {
 
             item.classList.add('border-b-2', 'border-blue-600', 'active', 'text-blue-600');
             
-            this.renderVideos(category); //this may be the problem
+            this.renderVideos(category); 
 
         }.bind(this));
     }
@@ -213,8 +209,9 @@ export default class videoLibrary {
             const category = this.select.value;
 
             if(videoId) {
-                if(!this.videos[category].includes(videoId)) {
+                if(!this.videos[category].includes(videoId) || !this.videos.all.includes(videoId)) {
                     this.addVideo(category, videoId);
+                    this.addVideo('all', videoId);
                     this.updateStorage();
                     this.input.value = '';
                     this.renderVideos(category);
@@ -243,46 +240,8 @@ export default class videoLibrary {
         const videosContainer = document.querySelector('#videos');
         videosContainer.innerHTML = '';
 
-      
-        if(renderCategory === 'all') {
-            this.currentCategory = 'all';
-            this.renderAllVideos(videosContainer);
-        } else {
-            this.currentCategory = renderCategory;
-            this.renderCategoryVideos(videosContainer, renderCategory);
-        }
-    }
-
-    renderAllVideos(videosContainer) {
-        this.renderVideosGrid(videosContainer);
-    }
-
-    renderVideosGrid(parentContainer){
-        const videosGrid = document.createElement('div');
-        videosGrid.classList.add('videos', 'grid', 'grid-cols-6', 'gap-10', 'my-5');
-        parentContainer.appendChild(videosGrid);
-      
-        
-        for(const category in this.videos) {
-            this.videos[category].forEach( (video, index) => {
-                const videoContainer = document.createElement('div');
-                videoContainer.classList.add('relative');
-                videoContainer.setAttribute('data-index', index);
-                videoContainer.innerHTML = `
-                    <img draggable="true" src="https://img.youtube.com/vi/${video}/0.jpg" alt="video" class="draggable cursor-pointer" />
-                    <button type="button" class="absolute top-2 right-1 text-gray-400 bg-gray-100 hover:bg-gray-300 hover:text-gray-900 rounded-lg text-sm p-0.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
-                        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                    </button>
-                `;
-                videosGrid.appendChild(videoContainer);
-
-                this.registerRemoveVideoEvent(video, category, videoContainer);
-
-                this.registerAddVideoToModalEvent(video, videoContainer);
-            });
-
-            //this.addDragAndDropEvents();
-        }
+        this.currentCategory = renderCategory;
+        this.renderCategoryVideos(videosContainer, renderCategory);
         
     }
 
@@ -302,7 +261,7 @@ export default class videoLibrary {
         const videosGrid = document.createElement('div');
         videosGrid.classList.add('videos', 'grid', 'grid-cols-6', 'gap-10', 'my-5');
         parentContainer.appendChild(videosGrid);
-      
+
         this.videos[category].forEach( (video, index) => {
             const videoContainer = document.createElement('div');
             videoContainer.classList.add('relative');
@@ -370,6 +329,7 @@ export default class videoLibrary {
         removeButton.addEventListener('click', function(e) {
             e.preventDefault();
             this.videos[category] = this.videos[category].filter( videoId => videoId !== video);
+            this.videos['all'] = this.videos['all'].filter( videoId => videoId !== video);
             this.updateStorage(videos);
             this.renderVideos(category);
         }.bind(this));
