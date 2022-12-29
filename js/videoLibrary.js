@@ -23,6 +23,7 @@ export default class videoLibrary {
         'tutorials': [],
         'news': [],
         'trailers': [],
+        'reviews': [],
         };
         
     }
@@ -325,11 +326,22 @@ export default class videoLibrary {
 
     registerRemoveVideoEvent(video, category, videoContainer) {
         const removeButton = videoContainer.querySelector('button');
-    
+
         removeButton.addEventListener('click', function(e) {
+
             e.preventDefault();
-            this.videos[category] = this.videos[category].filter( videoId => videoId !== video);
             this.videos['all'] = this.videos['all'].filter( videoId => videoId !== video);
+            if(category === 'all') {
+                //check if video is in other categories
+                for (const cat in this.videos) {
+                    if(this.videos[cat].includes(video) === true) {
+                        this.videos[cat] = this.videos[cat].filter( videoId => videoId !== video);  
+                    }             
+                }
+            } else {
+                this.videos[category] = this.videos[category].filter( videoId => videoId !== video);
+            }
+            
             this.updateStorage(videos);
             this.renderVideos(category);
         }.bind(this));
