@@ -219,6 +219,8 @@ export default class videoLibrary {
                 } else {
                     alert('Video already added');
                 }
+            } else {
+                alert('Invalid youtube url');
             }
         }.bind(this));
     }
@@ -232,9 +234,13 @@ export default class videoLibrary {
     }
 
     getYoutubeVideoId(url){
-        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-        var match = url.match(regExp);
-        return (match&&match[7].length==11)? match[7] : false;
+        var regExp = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+        var match = regExp.exec(url);
+        if(match != null) {
+            return match[3];
+        } else {
+            return false;
+        }
     }
     
     renderVideos(renderCategory = 'all') {
