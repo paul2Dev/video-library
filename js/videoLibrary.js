@@ -15,20 +15,27 @@ export default class videoLibrary {
         this.videos = JSON.parse(localStorage.getItem("videos") || JSON.stringify({}))
 
         this.categories = {
-        'all': [],
-        'gaming': [],
-        'coding': [],
-        'photography': [],
-        'gym': [],
-        'tutorials': [],
-        'news': [],
-        'trailers': [],
-        'reviews': [],
-        };
+            'all': [],
+            'new category': [],
+            'gaming': [],
+            'coding': [],
+            'photography': [],
+            'gym': [],
+            'tutorials': [],
+            'news': [],
+            'trailers': [],
+            'reviews': [],
+            'music': [],
+            };
+
+        this.categories = JSON.parse(localStorage.getItem("categories") || JSON.stringify(this.categories))
         
     }
 
     init() {
+
+        this.appContainer.innerHTML = '';
+
         this.renderForm();
 
         this.renderNavigation();
@@ -139,6 +146,11 @@ export default class videoLibrary {
         this.button = document.querySelector('#addVideo');
         this.select = document.querySelector('#videoCategory');
         
+        const firstItem = document.createElement('option');
+        firstItem.value = 'select category';
+        firstItem.textContent = 'select category';
+        this.select.appendChild(firstItem);
+        
         for (const category in this.categories) {
             if(category != 'all') {
                 const option = document.createElement('option');
@@ -147,8 +159,15 @@ export default class videoLibrary {
                 this.select.appendChild(option);
             }   
             if(!this.videos[category]){
-                this.videos[category] = [];
+                if(category != 'new category') {
+                    this.videos[category] = [];
+                }
             }
+
+            if(category === 'new category') {
+                this.registerNewCategoryEvent();
+            }
+
         }
         this.updateStorage();
 
@@ -157,6 +176,7 @@ export default class videoLibrary {
 
     updateStorage() {
         localStorage.setItem('videos', JSON.stringify(this.videos));
+        localStorage.setItem('categories', JSON.stringify(this.categories));
     }
 
     renderNavigation(){
@@ -171,17 +191,36 @@ export default class videoLibrary {
         navigationContainer.appendChild(navigationList);
       
         for(const category in this.categories) {
-            const navigationItem = document.createElement('li');
-            navigationItem.classList.add('mr-2');
-            navigationItem.innerHTML = `
-            <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" data-category="${category}">${category}</a>
-            `;
-            navigationList.appendChild(navigationItem);
-        
-            this.registerNavigationEvent(navigationItem, category);
+            if(category != 'new category') {
+                const navigationItem = document.createElement('li');
+                navigationItem.classList.add('mr-2');
+                navigationItem.innerHTML = `
+                <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" data-category="${category}">${category}</a>
+                `;
+                navigationList.appendChild(navigationItem);
+            
+                this.registerNavigationEvent(navigationItem, category);
+            }
         }
 
         this.appContainer.appendChild(navigationContainer);
+    }
+
+    registerNewCategoryEvent() {
+        this.select.addEventListener('change', function(e) {
+            e.preventDefault();
+            const category = this.select.value;
+            if(category === 'new category') {
+                const newCategory = prompt('Enter new category name');
+                if(newCategory) {
+                    console.log(newCategory);
+                    this.categories[newCategory] = [];
+                    this.videos[newCategory] = [];
+                    this.updateStorage();
+                    this.init();
+                }
+            }
+        }.bind(this));
     }
 
     registerNavigationEvent(item, category = 'all') {
@@ -208,6 +247,11 @@ export default class videoLibrary {
             const video = this.input.value;
             const videoId = this.getYoutubeVideoId(video);
             const category = this.select.value;
+
+            if(category === 'select category') {
+                alert('Select category');
+                return;
+            }
 
             if(videoId) {
                 if(!this.videos[category].includes(videoId) || !this.videos.all.includes(videoId)) {
