@@ -17,15 +17,6 @@ export default class videoLibrary {
         this.categories = {
             'all': [],
             'new category': [],
-            'gaming': [],
-            'coding': [],
-            'photography': [],
-            'gym': [],
-            'tutorials': [],
-            'news': [],
-            'trailers': [],
-            'reviews': [],
-            'music': [],
             };
 
         this.categories = JSON.parse(localStorage.getItem("categories") || JSON.stringify(this.categories))
